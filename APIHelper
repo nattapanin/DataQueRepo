@@ -1,0 +1,104 @@
+using System;
+using System.Collections.Generic;
+using  System.Net.Http;
+using System.Threading.Tasks;
+
+namespace CodeSamplesRepo
+{
+    internal class APIHelper
+    {
+        public async Task<string> GetBearerTokenWithpassword()
+        {
+            string res = "";
+            string AuthEnpoint = "API End point";
+            string username = "username";
+            string password = "password";
+            string cliendid = "clientid";
+            string clientSec = "clientsecrete";
+
+            var content = new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string, string>("grant_type", "Password"),
+                new KeyValuePair<string, string>("username", username),
+                new KeyValuePair<string, string>("password", password),
+                new KeyValuePair<string, string>("client_id",cliendid),
+                new KeyValuePair<string, string>("client_Secrete", clientSec),
+                new KeyValuePair<string, string>("scope","openid")
+            });
+
+            using (var client = new HttpClient())
+            {
+                HttpResponseMessage response = null;
+                client.PostAsync(AuthEnpoint, content).ContinueWith(t =>
+                {
+                    try
+                    {
+                        response = t.Result;
+                    }
+                    catch (Exception)
+                    {
+
+                        throw;
+                    }
+                }).Wait();
+                res = await response.Content.ReadAsStringAsync();
+            }
+            return res;
+        }
+
+        public async Task<string> GetBearerTokenWithClientToken()
+        {
+            string res = "";
+            string AuthEnpoint = "API End point";
+            string cliendid = "clientid";
+            string clientSec = "clientsecrete";
+
+            var content = new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string, string>("grant_type", "client_credential"),
+                new KeyValuePair<string, string>("client_id",cliendid),
+                new KeyValuePair<string, string>("client_Secrete", clientSec),
+                new KeyValuePair<string, string>("scope","openid")
+            });
+
+            using (var client = new HttpClient())
+            {
+                HttpResponseMessage response = null;
+                client.PostAsync(AuthEnpoint, content).ContinueWith(t =>
+                {
+                    try
+                    {
+                        response = t.Result;
+                    }
+                    catch (Exception)
+                    {
+
+                        throw;
+                    }
+                }).Wait();
+                res = await response.Content.ReadAsStringAsync();
+            }
+            return res;
+
+        }
+
+        public string CallAPIWithBearerToken()
+        {
+            string results = string.Empty;
+            string BearerToken = "Token";
+            string authendpointurl = "URL";
+            using (var client = new HttpClient())
+            {
+                HttpResponseMessage response = null;
+                //client.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "application/json");
+                client.DefaultRequestHeaders.TryAddWithoutValidation("authorization", BearerToken);
+                //client.DefaultRequestHeaders.TryAddWithoutValidation(results, "application/json");
+                client.BaseAddress = new Uri(authendpointurl);
+                response = new HttpResponseMessage();
+                var responsetext = response.Content.ReadAsStringAsync().Result;
+                results = responsetext;
+            }
+            return results;
+        }
+    }
+}
